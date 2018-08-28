@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0067)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab07.html -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	<meta name="AUTHOR" content="Bhaskaran Raman">
+	<meta name="CREATED" content="20090815;17260600">
+	<meta name="CHANGEDBY" content="Bhaskaran Raman">
+	<meta name="CHANGED" content="20150930;9461600">
+	<style type="text/css">
+	<!--
+		H3.cjk { font-family: "Droid Sans Fallback" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</style>
+</head>
+<body dir="LTR" lang="en-IN" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 07</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p style="font-variant: normal; font-style: normal">Performance
+	benefits of data forwarding</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Understanding
+	the importance of pipeline scheduling</p>
+	</li><li><p style="font-variant: normal; font-style: normal">A simple but
+	practical introduction to loop unrolling</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done individually.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding.</p>
+	</li><li><p>Create a directory called &lt;rollno&gt;-&lt;labno&gt;. Store
+	all relevant files to this lab in that directory.</p>
+	<ol type="a">
+		<li><p>In the exercises, you will be asked various questions. Note
+		down the answers to these in a file called “lab07-answers.txt”.</p>
+		</li><li><p>In some parts of the exercises, you will have to show a demo
+		to a TA; these are marked as such. The evaluation for each lab will
+		be in the subsequent lab, or during a time-slot agreed upon with
+		the TAs. For this evaluation, you need to upload your code as well.</p>
+		</li><li><p>While submitting (on moodle), you have to create a tar.gz or
+		zip of the entire &lt;rollno&gt;-&lt;labno&gt; directory in which
+		all your relevant files reside.</p>
+	</li></ol>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>You have signed the attendance sheet</p>
+		</li><li><p>You have uploaded your submission</p>
+	</li></ol>
+	</li><li><p>Things to ensure during TA evaluation of a particular lab
+	submission:</p>
+	<ol type="a">
+		<li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>House
+	points:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">Some
+	questions carry house points. For these, you are allowed to work
+	along with others, but only if </span></span></span><i><span style="font-weight: normal">all</span></i>
+	<span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">of
+	those working together have completed the lab and shown it to the
+	TA. (You can work on it individually, even before finishing the lab
+	completely, but only if you care about house points more than your
+	own marks!). All questions related to house points have to be shown
+	to the instructor (Bhaskar).</span></span></span></p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Benefits
+of data forwarding in the MIPS64 pipeline</font></h3>
+<ul>
+	<li><p>Convert the following C code into MIPS64 code in file
+	<font face="Courier 10 Pitch"><b>lab7-2b.s</b></font></p>
+	<p><font face="Courier 10 Pitch">double a[] = {1.0, 2.0, 3.0, 4.0,
+	5.0, 6.0};<br>double b[] = {2.0, 3.0, 4.0, 5.0, 6.0, 7.0};<br>double
+	c[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};<br>double d[] = {0.0, 0.0,
+	0.0, 0.0, 0.0, 0.0};<br>int n = 6;<br>double alpha = 10.0; <br>for
+	(i = 0; i &lt; n; i++) {<br>  c[i] = a[i] * b[i];<br>  d[i] += c[i]
+	* alpha;<br>}</font></p>
+	</li><li><p><b>Question 1. [1 mark]:</b> Run the MIPS64 code <b>lab7-2b.s</b> on WinMIPS64,
+	with data forwarding enabled. Then subsequently run the same code
+	with data forwarding disabled. Write the number of clock cycles
+	taken for execution in each case in the file <b>lab7_answers.txt</b>. Also write the value of the speedup due to data
+	forwarding in the file <b>lab7_answers.txt</b></p>
+	</li><li><p><b>Question 2. [1 mark]:</b> If you blindly translate the C code
+	to MIPS64 assembly code, there must be two branch instructions per
+	loop iteration. You can optimize this to have only one branch
+	operation per loop iteration. Do this optimization and create a new code file
+	<font face="Courier 10 Pitch"><b>lab7-1b.s</b></font>. Answer question 1 again but now for <b>lab7-1b.s</b> and note down the answers in the file <b>lab7_answers.txt</b>
+	</p></li><li><p>From now onwards for further modifications we will always
+	<b>use data forwarding</b> and <b>use the single-branch-per-iteration</b> version
+	of the code.</p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Code
+scheduling for performance improvement</font></h3>
+<ul>
+	<li><p>For this exercise, you need to be well aware of the number of
+	cycles taken by each of the execution units in the MIPS64 pipeline
+	implementation. You can learn this from within WinMIPS64 itself.</p>
+	</li><li><p><b>Question 3. [2 marks]:</b> Schedule the code within the loop above, such that the number
+	of stall cycles is minimized.  Write this modified code in file
+	<font face="Courier 10 Pitch"><b>lab7-1b-sched.s</b></font>. Also write the value of performance improvement due to such scheduling in the file <b>lab7_answers.txt</b></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Question 4. [1 mark]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Comment the file <b>lab7-1b-sched.s</b> showing which are the stalls which you are </span></span><i>not</i> <span style="font-variant: normal"><span style="font-style: normal">yet able to mask through scheduling.</span></span></p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Loop
+unrolling to reduce loop overhead</font></h3>
+<ul>
+	<li><p>Loop unrolling is a performance enhancement technique which
+	trades off code size for code speed. That is, it achieves better
+	execution speed at the cost of potentially larger code size. You can
+	read briefly about loop unrolling in your textbook or online.</p>
+	</li><li><p><b>Question 5. [2 marks]:</b>You are now going to unroll the <b>unscheduled</b> <span style="font-variant: normal"><span style="font-style: normal">code. Unroll it twice, in file </span></span><span style="font-variant: normal"><font face="Courier 10 Pitch"><span style="font-style: normal"><b>lab7-1b-unroll2.s</b></span></font></span><span style="font-variant: normal"><span style="font-style: normal">.
+ That is, two iterations of the earlier loop is now effectively achieved
+ by one iteration of this loop. In your new loop, the loop variable will
+ be incremented by 2 for each iteration. Also write the value of 
+performance improvement due to such scheduling in the file <b>lab7_answers.txt</b></span></span></p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Code
+scheduling after unrolling</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal"><b>Question 6. [2 marks]:</b>A
+	non-trivial benefit of loop unrolling is the large number of
+	opportunities it gives for better code scheduling, to avoid stalls.
+	Do the necessary code scheduling in file <font face="Courier 10 Pitch"><b>lab7-1b-sched-unroll2.s</b></font>
+	.  To do such scheduling, you may have to do some register renaming
+	(find out what it is) to remove anti-dependences (find out what it
+	is). Also write the value of performance improvement due to such scheduling in the file <b>lab7_answers.txt</b></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Question 7. [1 marks]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Comments the file <b>lab7-1b-sched-unroll2.s</b> showing which are the stalls which
+	you are </span></span><i>not</i> <span style="font-variant: normal"><span style="font-style: normal">yet able to mask through scheduling.</span></span></p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">House
+points</font></h3>
+<ul>
+	<li><p><span style="font-variant: normal"><span style="font-style: normal"><b>5
+	house points:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">unroll
+	the loop thrice and show the performance benefits of
+	unrolling+scheduling in this case. How does this performance
+	improvement compare with that due to unrolling twice?</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>5
+	house points:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">change
+	your code such that it can handle cases where </span></span><i>n</i>
+	<span style="font-variant: normal"><span style="font-style: normal">is
+	not a multiple of 3. What is the performance improvement now?</span></span></p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Submission</font></h3>
+<ul>
+	<li><p><span style="font-variant: normal"><span style="font-style: normal">Submit (Roll Number)_lab7.tar.gz containing the files:</span></span></p>
+	</li><li>lab7_answers.txt
+	</li><li>lab7-2b.s
+	</li><li>lab7-1b.s
+	</li><li>lab7-1b-sched.s
+	</li><li>lab7-1b-unroll2.s
+	</li><li>lab7-1b-sched-unroll2.s
+</li></ul>
+<p><br><br>
+</p>
+
+</body></html>

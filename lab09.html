@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0067)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab09.html -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	
+	<title></title>
+	<meta name="generator" content="LibreOffice 4.2.2.1 (Windows)">
+	<meta name="author" content="Bhaskaran Raman">
+	<meta name="created" content="20090815;17260600">
+	<meta name="changedby" content="Bhaskaran Raman">
+	<meta name="changed" content="20151014;71953412000000">
+	<style type="text/css">
+	<!--
+		h3.cjk { font-family: "SimSun" }
+		h3.ctl { font-family: "Mangal" }
+	-->
+	</style>
+</head>
+<body lang="en-IN" dir="ltr" style="background: transparent" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 09</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p style="font-variant: normal; font-style: normal">Understanding
+	the performance effects of the memory hierarchy</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Writing a
+	program to guess the machine's cache size</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done individually.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding.</p>
+	</li><li><p>Create a directory called &lt;rollno&gt;-&lt;labno&gt;. Store
+	all relevant files to this lab in that directory.</p>
+	<ol type="a">
+		<li><p>In the exercises, you will be asked various questions. Note
+		down the answers to these in a file called “lab09-answers.txt”.</p>
+		</li><li><p>In some parts of the exercises, you will have to show a demo
+		to a TA; these are marked as such. The evaluation for each lab will
+		be in the subsequent lab, or during a time-slot agreed upon with
+		the TAs. For this evaluation, you need to upload your code as well.</p>
+		</li><li><p>While submitting (on BodhiTree), you have to create a tar.gz
+		or zip of the entire &lt;rollno&gt;-&lt;labno&gt; directory in
+		which all your relevant files reside.</p>
+	</li></ol>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>You have signed the attendance sheet</p>
+		</li><li><p>You have uploaded your submission</p>
+	</li></ol>
+	</li><li><p>Things to ensure during TA evaluation of a particular lab
+	submission:</p>
+	<ol type="a">
+		<li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>House
+	points:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">Some
+	questions carry house points. For these, you are allowed to work
+	along with others, but only if </span></span></span><i><span style="font-weight: normal">all</span></i>
+	<span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">of
+	those working together have completed the lab and shown it to the
+	TA. (You can work on it individually, even before finishing the lab
+	completely, but only if you care about house points more than your
+	own marks!). All questions related to house points have to be shown
+	to the instructor (Bhaskar).</span></span></span></p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Effect
+of memory hierarchy on the performance of matrix multiplication</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal">Read the
+	'pitfall' mentioned in page 551 of the textbook (3<sup>rd</sup>
+	edition). This talks about the effect of the memory hierarchy on
+	something similar to a matrix multiplication algorithm.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">In this
+	exercise, you have to first implement a regular 3-nested-loop matrix
+	multiplication algorithm in C-language. Write a file called
+	'mat-mult.cc'. The program should declare 3 static 2-D arrays of
+	type 'double'. Call these arrays A, B, and C. Use a '#define' for
+	the SIZE of the 2D square arrays.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">A is
+	initialized to the zero matrix, B to 2I (twice the identity matrix),
+	and C to a matrix whose first row is [0, 1, 2, ..., SIZE-1] and all
+	other rows are 0.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Within the
+	'main' of the program, write the 3-nested-loop matrix multiplication
+	algorithm. The heart of the loop will be something like:<br>A[i][j]
+	= A[i][j] + B[i][k]*C[k][j]</p>
+	</li><li><p style="font-variant: normal; font-style: normal">In this
+	loop, A and B are accessed row-wise, while C is accessed
+	column-wise. Now, C-language allocates memory in row-major order
+	(i.e. one row after another). So column-wise array access has little
+	locality of reference, while row-wise access has good locality of
+	reference.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Compile the
+	program and run it, for SIZE=500. Estimate the time taken to run it,
+	using the 'time' command. Run it 5 times and take the median value
+	as the run-time.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">You are now
+	going to make the program more efficient by first computing another
+	matrix D, which is the transpose of the C matrix, to take advantage
+	of locality of array access. Note that you will still be computing
+	A=B*C, but will use the fact that transpose(transpose(D)) = C.</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Demo to
+	TA [3 marks]:</b> Make the modification as suggested above, and save
+	it in a file called 'mat-mult-opt.cc'. Compile and run the modified
+	program 'mat-mult-opt.cc'. Compute the median run time of 5 runs, as
+	earlier. Compare the run-time with the earlier run-time. Do you get
+	a 'feel' for the effect of caches on your program's performance?</p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">Confirming the effect of the memory hierarchy,
+using dineroIV</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal"><font color="#000000">In
+	this exercise, you are going to produce (an approximate) dineroIV
+	trace file of the execution of 'mat-mult.cc' and 'mat-mult-opt.cc'.
+	We are going to ignore all instruction references (i.e. only deal
+	with a D-cache), and also ignore all data references other than the
+	4 arrays: A, B, C, and D (i.e. ignore i, j, k).</font></p>
+	</li><li><p style="font-variant: normal; font-style: normal"><font color="#000000">Modify
+	both programs ('mat-mult.cc' and 'mat-mult-opt.cc') to make them
+	print the <i>addresses</i> of the data they refer during their
+	execution. Print in a format which can be understood by 'dineroIV'.
+	Take care to print both reads as well as writes. (You can assume the
+	specific manner of C-language expression evaluation; it is quite
+	obvious).</font></p>
+	</li><li><p><font color="#000000"><i>IMPORTANT NOTE-1: Do NOT print the
+	output to a file, it would be too huge. You have to redirect the
+	output of your program to dineroIV directly using a UNIX pipe.</i></font></p>
+	</li><li><p><font color="#000000"><i>IMPORTANT NOTE-2: Change the SIZE of
+	the array to 100x100 (from 500x500 earlier), else your simulation
+	will run for very long.</i></font></p>
+	</li><li><p><font color="#000000"><i>Hint: You may want to print the
+	index of the outer most loop 'i' for each iteration. This is so that
+	you know that your program is making progress. Note that you have to
+	print to STDERR so that the input to dineroIV is not affected.</i></font></p>
+	</li><li><p style="font-variant: normal; font-style: normal"><font color="#000000"><b>Demo
+	to TA [3 marks]:</b> Run the modified programs. Get the output file
+	and feed it as input to 'dineroIV' with the following configuration:
+	16-word blocks, 128KB data cache size, direct-mapped, write-back
+	with write-allocate. Are you able to bolster your observations
+	regarding program performance from the previous exercise?</font></p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">Writing a program to guess the size of the
+cache</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal; page-break-after: avoid">
+	<font color="#000000">In this exercise, you will write a clever
+	program which will try to guess the size of the machine's cache. The
+	idea is as follows. Declare a large array and access its elements.
+	Compute the average access time. Once the size of the array exceeds
+	the cache size, you will see a significant jump in the average
+	access time (due to the miss penalty). With this, you can guess the
+	cache size.</font></p>
+	</li><li><p><font color="#000000"><i>Hints: In my solution, I used an int
+	array. I had to arrange to access elements such that there was no
+	spatial locality. This I did by accessing elements 97 words away
+	from one another (and using %guess_size to arrange wrap-around). I
+	multiplied guess_size by 2 each time. I also had to adjust the
+	averaging loop somewhere between 100 and 10000, depending on the
+	guess_size. With this arrangement, I was able to guess the L2 cache
+	size. Other similar solutions may work for you.</i></font></p>
+	</li><li><p style="font-variant: normal; font-style: normal"><font color="#000000">You
+	may have to use the function gettimeofday() to do time measurements
+	within your program.</font></p>
+	</li><li><p><font color="#000000"><i><b>WARNING-1:</b> make sure to print
+	anything <span style="text-decoration: none"><b>after</b></span> you
+	have done all time computations necessary. This is because printing
+	itself takes a very long time (several milli-seconds) and will
+	disrupt any time measurements you may make within your program if
+	you print anything inbetween.</i></font></p>
+	</li><li><p><font color="#000000"><i><b>WARNING-2:</b> you need to pay
+	careful attention to the types of various variables: int, long,
+	float, double, etc. This could be a source of bug in this program.</i></font></p>
+	</li><li><p><font color="#000000"><i><b>WARNING-3:</b> This is a tough
+	problem. I had a tough time working out the hints/warnings I have
+	given above. Hopefully with the hints it would be easier for you.
+	But in any case, try this problem last.</i></font></p>
+	</li><li><p><span style="font-variant: normal"><font color="#000000"><span style="font-style: normal"><b>Demo
+	to TA [4 marks]:</b></span></font></span><font color="#000000">
+	</font><span style="font-variant: normal"><font color="#000000"><span style="font-style: normal">Implement
+	a 'C' program using the above idea, called 'guess-cache-size.cc'.
+	Plot the above-mentioned graph, and explain how you have guessed the
+	cache size.</span></font></span></p>
+</li></ul>
+<h3 class="western"><font color="#0000ff">House points</font></h3>
+<ul>
+	<li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Upto
+	20 house points:</b></span></span> The book shows some performance
+	studies comparing the performance of radix sort with that of
+	quick-sort. Implement both sorting algorithms and generate graphs
+	similar to that in the textbook. Use the dineroIV cache simulator as
+	necessary, in a manner similar to how we have used it above. You
+	will get upto 20 house points, depending on the level of clarity in
+	what you show.</p>
+	</li><li><p><b>Upto 20 house points:</b> If you are able to guess the L1
+	cache size using a program.</p>
+</li></ul>
+<p><br><br>
+</p>
+<p><br><br>
+</p>
+
+</body></html>

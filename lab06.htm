@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0066)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab06.htm -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	<meta name="AUTHOR" content="Bhaskaran Raman">
+	<meta name="CREATED" content="20090815;17260600">
+	<meta name="CHANGEDBY" content="Bhaskaran Raman">
+	<meta name="CHANGED" content="20150922;11570100">
+	<style type="text/css">
+	<!--
+		H3.cjk { font-family: "Droid Sans Fallback" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</style>
+</head>
+<body lang="en-IN" dir="LTR" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 06</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p style="font-variant: normal; font-style: normal">Learn to use
+	the WinMIPS64 pipeline simulator for the MIPS64 architecture</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Understanding
+	various kinds of hazards and stalls</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Understanding
+	data forwarding</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done individually.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding.</p>
+	</li><li><p>Create a directory called &lt;rollno&gt;-&lt;labno&gt;. Store
+	all relevant files to this lab in that directory.</p>
+	<ol type="a">
+		<li><p>In the exercises, you will be asked various questions. Note
+		down the answers to these in a file called “lab06-answers.txt”.</p>
+		</li><li><p>In some parts of the exercises, you will have to show a demo
+		to a TA; these are marked as such. The evaluation for each lab will
+		be in the subsequent lab, or during a time-slot agreed upon with
+		the TAs. For this evaluation, you need to upload your code as well.</p>
+		</li><li><p>While submitting (on moodle), you have to create a tar.gz or
+		zip of the entire &lt;rollno&gt;-&lt;labno&gt; directory in which
+		all your relevant files reside.</p>
+	</li></ol>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>You have signed the attendance sheet</p>
+		</li><li><p>You have uploaded your submission</p>
+	</li></ol>
+	</li><li><p>Things to ensure during TA evaluation of a particular lab
+	submission:</p>
+	<ol type="a">
+		<li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>House
+	points:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">Some
+	questions carry house points. For these, you are allowed to work
+	along with others, but only if </span></span></span><i><span style="font-weight: normal">all</span></i>
+	<span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">of
+	those working together have completed the lab and shown it to the
+	TA. (You can work on it individually, even before finishing the lab
+	completely, but only if you care about house points more than your
+	own marks!). All questions related to house points have to be shown
+	to the instructor (Bhaskar).</span></span></span></p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Using
+the WinMIPS64 simulator</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal">The
+	WinMIPS64 simulator is a MIPS64 pipeline simulator. The MIPS64
+	architecture is the 64-bit version of the MIPS architecture. The
+	MIPS64 5-stage pipeline is similar to the MIPS/DLX 5-stage pipeline.
+	The MIPS64 instruction set reference is given to you, please refer
+	to it to write MIPS64 assembly code.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">winmips64 is
+	a windows program, but it can run on Linux using “wine
+	/path/to/winmips64.exe”, on the lab machines; “wine” is
+	windows emulator. Refer to the winmips64 tutorial for a brief
+	introduction to winmips64.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">The
+	winmips64 simulator uses a simple “memory-mapped I/O” scheme for
+	input/output, in case you need it. You can look at the testio.s to
+	understand. Such I/O should not be required for the exercises in
+	this lab, but you may need it to understand pre-written code (e.g.
+	if you try to step through factorial.s).</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Demo to
+	TA [1 mark]:</b> load and run the “factorial.s” program.
+	Remember, you will find that at some point it is asking for terminal
+	input, so be sure to open the “terminal” sub-window in
+	winmips64.</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Question
+	[0.5 marks]:</b> What branch prediction technique does the simulator
+	use? Substantiate your answer. You can use any program other than
+	factorial.s for this, if convenient. Write your answer down in lab6_answers.txt</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Question
+	[0.5 marks]:</b> In which stage does the branch instruction require
+	its inputs? Substantiate your answer. Write your answer down in lab6_answers.txt</p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">Identifying data forwarding, stalls</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal">You can now
+	use simpler DLX code, like the one in “cs341-lab6.s”. In most of
+	these cases, you have to show the corresponding cycle diagram (in
+	the “clock cycle diagram” window in winmips64).</p>
+	</li><li><p style="font-variant: normal; font-style: normal">In the
+	“pipeline” diagram (in one of the winmips64 windows), you can see
+	that apart from the EX, there are three other functional units:
+	multiplier, FP adder, DIV.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">For each of the following parts, you need to write the code in a separate file and also submit screenshots of the cycle diagrams indicating the feature asked in the sub-question. Create 2 directorys called code and images and put all the code files in the code directory and all the corresponding screenshots in the images directory. Also explain why the code you have written works for that sub-question in 2-3 lines in lab6_answers.txt</p>
+	</li><li><p style="font-variant: normal; font-style: normal">1) Write DLX
+	assembly code which causes (a) one or more data stalls, and (b) one
+	or more control stalls. Save the code and screenshot as q1.s and q1.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">2) Write DLX
+	assembly code such that there is now a stall in the ID stage of a
+	branch instruction. Save the code and screenshot as q2.s and q2.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">3) Write DLX
+	assembly code such that there is data forwarding from the EX stage to
+	the ID stage for some pair of instructions. Save the code and screenshot as q3.s and q3.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">4) Write DLX
+	assembly code such that there is data forwarding from the MEM stage to
+	the ID stage for some pair of instructions. Save the code and screenshot as q4.s and q4.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">5) Write DLX
+	assembly code to cause the maximum possible stall between a pair of
+	instructions. Save the code and screenshot as q5.s and q5.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">6) Write DLX
+	assembly code to cause data forwarding between two instructions that
+	are as far apart as possible. Save the code and screenshot as q6.s and q6.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">7) Write DLX
+	assembly code to cause a WAW stall. Save the code and screenshot as q7.s and q7.jpeg</p>
+	</li><li><p style="font-variant: normal; font-style: normal">8) Write DLX
+	assembly code to cause a structural stall. Save the code and screenshot as q8.s and q8.jpeg</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Evaluation [1 x 8 = 8 marks]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">This question will be evaluated by going through the code, cycle screenshots and explanations written by you in lab6_answers.txt</span></span></p>
+</li></ul>
+<p><br><br>
+</p>
+
+
+</body></html>

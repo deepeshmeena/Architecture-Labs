@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0067)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab03.html -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	<meta name="AUTHOR" content="Bhaskaran Raman">
+	<meta name="CREATED" content="20090815;17260600">
+	<meta name="CHANGEDBY" content="Bhaskaran Raman">
+	<meta name="CHANGED" content="20150811;17074000">
+	<style type="text/css">
+	<!--
+		H3.cjk { font-family: "Droid Sans Fallback" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</style>
+</head>
+<body lang="en-IN" dir="LTR" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 03</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p>Understand stack operations, by writing recursive functions</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done individually.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding.</p>
+	</li><li><p>Create a directory called &lt;rollno&gt;-&lt;labno&gt;. Store
+	all relevant files to this lab in that directory.</p>
+	<ol type="a">
+		<li><p>In the exercises, you will be asked various questions. Note
+		down the answers to these in a file called “lab03-answers.txt”.</p>
+		</li><li><p>In some parts of the exercises, you will have to show a demo
+		to a TA; these are marked as such. The evaluation for each lab will
+		be in the subsequent lab, or during a time-slot agreed upon with
+		the TAs. For this evaluation, you need to upload your code as well.</p>
+		</li><li><p>While submitting (on BodhiTree), you have to create a tar.gz
+		or zip of the entire &lt;rollno&gt;-&lt;labno&gt; directory in
+		which all your relevant files reside.</p>
+	</li></ol>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>You have signed the attendance sheet</p>
+		</li><li><p>You have uploaded your submission</p>
+	</li></ol>
+	</li><li><p>Things to ensure during TA evaluation of a particular lab
+	submission:</p>
+	<ol type="a">
+		<li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Getting
+warmed up with 'factorial'</font></h3>
+<ul>
+	<li><p><font color="#000000">You will first code up and test the
+	assembly version of the recursive factorial computation, in a file
+	called “factorial.s”. <i>Hint: Like always, you will find it
+	useful to write the C-code version and translate it (blindly). Note:
+	the code for the factorial is given in the slides, you are 
+	allowed to look at this, but only </i><i><b>before</b></i> <i><span style="font-weight: normal">coding,
+	</span></i><i><b>not</b></i> <i><b>while</b></i> <i><span style="font-weight: normal">coding</span></i><i>.</i></font></p>
+	</li><li><p style="font-variant: normal; font-style: normal"><font color="#000000">Your
+	main program should call the factorial routine on an integer (this
+	can be hardcoded).</font></p>
+	</li><li><p style="font-variant: normal; font-style: normal"><font color="#000000"><b>Demo
+	to TA [2 marks]:</b> show the working of the above program.</font></p>
+</li></ul>
+<h3 class="western"><font color="#0000ff">Recursive binary search</font></h3>
+<ul>
+	<li><p style="margin-top: 0.42cm">Write a recursive binary search
+	function in MIPS assembly code in file “binarySearch.s”.  The
+	function must take 5 arguments, as per the C prototype below:<br>//
+	Take an array A with 'len' elements as input; A is assumed to be
+	sorted in increasing order<br>// Search for value 'val' in the index
+	range [start, end)<br>// return index where 'val' is found, if it is
+	found; return -1 if 'val' not found<br>int binarySearch(int *A, int
+	len, int start, int end, int val);</p>
+	</li><li><p style="margin-top: 0.42cm">While it may be possible to write
+	the function with a different set of arguments, you MUST write as
+	per the above specification.  Also, you MUST use recursion, a
+	non-recursive solution will fetch you ZERO marks.</p>
+	</li><li><p style="margin-top: 0.42cm">You must follow the MIPS coding
+	conventions in terms of caller and callee saved registers and other
+	register usage.  You can define and use your own stack frame format
+	though.  Specify your stack frame format in the answers text file.</p>
+	</li><li><p style="margin-top: 0.42cm">In the same file, declare a static
+	array A of size 8 (or more); ensure to initialize it in a sorted
+	manner.</p>
+	</li><li><p style="margin-top: 0.42cm">From the main routine, call the
+	recursive binarySearch, to search for a given value (taken via
+	STDIN).  The main function should call:<br>binarySearch(A,
+	&lt;len-of-A&gt;, 0, &lt;len-of-A&gt;, &lt;some-val&gt;)<br>Print
+	the result of the search onto the console (STDOUT).</p>
+	</li><li><p style="margin-top: 0.42cm"><i>Hint: As earlier, it would be
+	useful to first debug the C-code version of the program, and then
+	translate it (blindly) into assembly code.</i></p>
+	</li><li><p style="margin-top: 0.42cm; font-variant: normal; font-style: normal">
+	<b>Demo to TA [4 marks]:</b> show the working of the above program.</p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Using
+break-point to watch the stack</font></h3>
+<ul>
+	<li><p style="margin-top: 0.42cm"><span style="font-variant: normal"><span style="font-style: normal"><b>Question
+	[4 marks]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">At
+	what point in your tree of call activations will the stack depth be
+	the maximum (just with respect to the recursive calls)? Insert a
+	breakpoint at a place in the code where the stack is at its maximum
+	size. Examine the stack and explain its contents with reference to
+	your code. Point out the various call activation records.  </span></span><span style="font-variant: normal"><i>Hint:
+	what input of 'value' will cause the maximum recursion depth?  Think
+	about this.</i></span></p>
+</li></ul>
+<p style="margin-top: 0.42cm; page-break-after: avoid"><br><br>
+</p>
+
+
+</body></html>

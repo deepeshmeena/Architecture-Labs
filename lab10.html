@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0067)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab10.html -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	<meta name="AUTHOR" content="Bhaskaran Raman">
+	<meta name="CREATED" content="20090815;17260600">
+	<meta name="CHANGEDBY" content="Bhaskaran Raman">
+	<meta name="CHANGED" content="20151027;16053000">
+	<style type="text/css">
+	<!--
+		H3.cjk { font-family: "Droid Sans Fallback" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</style>
+</head>
+<body lang="en-IN" dir="LTR" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 10</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p style="font-variant: normal; font-style: normal">Writing a
+	program to guess the hard-disk or pen-drive sector size</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done in <b>groups of two students</b>.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding</p>
+	</li><li><p>In the exercises, you will be asked various questions. Note
+	down the answers to these in a file called “lab10-answers.txt”.</p>
+	</li><li><p>In some parts of the exercises, you will have to show a demo
+	to a TA; these are marked as such.</p>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>The TA has looked at all the relevant demos</p>
+		</li><li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+	</li><li><p><b>House points:</b> <span style="font-weight: normal">Some
+	questions carry house points. For these, you are allowed to work
+	along with others, but only if </span><i><span style="font-weight: normal">all</span></i>
+	<span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">of
+	those working together have completed the lab and shown it to the
+	TA. (You can work on it individually, even before finishing the lab
+	completely, but only if you care about house points more than your
+	own marks!). All questions related to house points have to be shown
+	to the instructor (Bhaskar).</span></span></span></p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Guessing
+the hard-disk/pen-drive sector size</font></h3>
+<ul>
+	<li><p><b>Question [0 marks]:</b> Write the names of both lab
+	partners in the answers file.</p>
+	</li><li><p>You are to write a program guess-sector-size.c which will
+	guess your hard-disk or pen-drive sector size.  Your program should
+	depend on analysis of time taken to read a certain quantity of
+	information in a certain pattern.</p>
+	</li><li><p>For this exercise, you have to use the hard-drive or
+	pen-drive's raw device, which would be something like “/dev/sda”
+	or “/dev/sdb” or “/dev/hda”.  You can find out which, by
+	using the 'mount' command.</p>
+	</li><li><p>You will need sudo or root access to run the program to read
+	the raw device (normal user programs have to go through the OS's
+	file system abstraction).</p>
+	</li><li><p><b>Demo to TA [1 mark]:</b> Find out the name of your raw
+	device and show how you found this out, in the demo.</p>
+	</li><li><p><font color="#ff0000"><b>WARNING:</b></font> Make sure you do
+	only <b>READ</b>, and not write.  Do NOT use any writing related
+	system calls.  If you end up writing, <font color="#ff0000">you can
+	damage your hard disk file system permanently</font>.</p>
+	</li><li><p><b>Question [0 marks]:</b> Have you checked that there is no
+	“write” command in your program? How did you check this?</p>
+	</li><li><p><b>Question [1 mark]:</b> The OS has a cache of disk sectors
+	read.  The time taken for a read will be near-zero if the requested
+	item is in the cache.  So find out how to clear this OS cache.  For
+	clearing the cache too, you will need sudo/root access.</p>
+	</li><li><p>Run the code on your laptop or PC, using the default
+	hard-disk or any other hard disk or pen drive.  Take care to clear
+	the OS cache as necessary before running.</p>
+	</li><li><p><b>Question [1+1=2 marks]:</b> Plot a graph of the relevant
+	read-latency metric against a chosen parameter.  Plot also another
+	line in the same graph in the case where the OS cache plays a role.</p>
+	</li><li><p><b>Demo to TA [5 marks]:</b> Explain the shape of the graph
+	and deduce the sector size from the graph shape.</p>
+	</li><li><p><b>Demo to TA [1 mark]:</b> Figure out how to use the fdisk
+	command to find out the sector size of your hard-drive or pen drive.
+	 Show the use of this command in the demo.</p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Hints
+for writing the guessing program</font></h3>
+<ul>
+	<li><p>You can guess the sector size in powers of 2, and assume a
+	max possible sector size like 1MB or so.</p>
+	</li><li><p>The key observation is that the hard-disk (or pen drive) is
+	read in units of sectors, even if the program wants to read lesser
+	amounts.  And once a sector is read, its contents are available in
+	the cache immediately after.</p>
+	</li><li><p>And, if some bytes are available in the cache, the latency to
+	read that is negligible compared to the latency of reading bytes not
+	in the cache.</p>
+	</li><li><p>In your program, you have to use the above facts to design an
+	appropriate reading latency metric which will show a large
+	difference between guesses which are smaller than the actual sector
+	size.</p>
+	</li><li><p>Do not forget to take average or median over a sufficient
+	number of readings, to tide over random other latency effects in the
+	system.</p>
+</li></ul>
+<p><br><br>
+</p>
+
+</body></html>

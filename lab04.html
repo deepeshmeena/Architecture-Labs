@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0067)http://bodhitree2.cse.iitb.ac.in/media/uploads/documents/lab04.html -->
+<html class="gr__bodhitree2_cse_iitb_ac_in"><script type="text/javascript" charset="utf-8" id="zm-extension" src="chrome-extension://fdcgdnkidjaadafnichfpabhfomcebme/scripts/webrtc-patch.js" async=""></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	<meta name="AUTHOR" content="Bhaskaran Raman">
+	<meta name="CREATED" content="20090815;17260600">
+	<meta name="CHANGEDBY" content="Bhaskaran Raman">
+	<meta name="CHANGED" content="20150819;12115300">
+	<style type="text/css">
+	<!--
+		H3.cjk { font-family: "Droid Sans Fallback" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</style>
+</head>
+<body lang="en-IN" dir="LTR" data-gr-c-s-loaded="true">
+<h1><font color="#800000">CS341, Computer Architecture Lab, Lab 04</font></h1>
+<h3 class="western"><font color="#0000ff">Goals</font></h3>
+<ol>
+	<li><p>Using a gcc cross-compiler to generate MIPS assembly code</p>
+	</li><li><p>Using the SPIM simulator to do instruction execution counts</p>
+	</li><li><p>Answering performance related questions using measurements</p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Instructions</font></h3>
+<ol>
+	<li><p>These exercises are to be done individually.</p>
+	</li><li><p>While you are encouraged to discuss with your colleagues, do
+	not cross the fine line between discussion <i>to understand</i>
+	versus discussion as a <i>short-cut</i> to complete your lab without
+	really understanding.</p>
+	</li><li><p>Create a directory called &lt;rollno&gt;-&lt;labno&gt;. Store
+	all relevant files to this lab in that directory.</p>
+	<ol type="a">
+		<li><p>In the exercises, you will be asked various questions. Note
+		down the answers to these in a file called “lab04-answers.txt”.</p>
+		</li><li><p>In some parts of the exercises, you will have to show a demo
+		to a TA; these are marked as such. The evaluation for each lab will
+		be in the subsequent lab, or during a time-slot agreed upon with
+		the TAs. For this evaluation, you need to upload your code as well.</p>
+		</li><li><p>While submitting (on BodhiTree), you have to create a tar.gz
+		or zip of the entire &lt;rollno&gt;-&lt;labno&gt; directory in
+		which all your relevant files reside.</p>
+	</li></ol>
+	</li><li><p>Before leaving the lab, ensure the following:</p>
+	<ol type="a">
+		<li><p>You have signed the attendance sheet</p>
+		</li><li><p>You have uploaded your submission</p>
+	</li></ol>
+	</li><li><p>Things to ensure during TA evaluation of a particular lab
+	submission:</p>
+	<ol type="a">
+		<li><p>The TA has looked at your text file with the answers to
+		various questions</p>
+		</li><li><p>The TA has given you marks out of 10, and has entered it in
+		the marks sheet, with his/her signature</p>
+		</li><li><p>You have counter-signed the above-mentioned marks</p>
+	</li></ol>
+	</li><li><p>You have to use the MIPS conventions, unless mentioned
+	otherwise.</p>
+	</li><li><p><b>House points:</b> <span style="font-weight: normal">Some
+	questions carry house points. For these, you are allowed to work
+	along with others, but only if </span><i><span style="font-weight: normal">all</span></i>
+	<span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">of
+	those working together have completed the lab and shown it to the
+	TA. (You can work on it individually, even before finishing the lab
+	completely, but only if you care about house points more than your
+	own marks!). All questions related to house points have to be shown
+	to the instructor (Bhaskar).</span></span></span></p>
+</li></ol>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Getting
+warmed up with the cross compiler</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal"><b>Question
+	[1 mark]:</b> What is a cross-compiler? What is the <i>host</i>
+	platform? What is the <i>target</i> platform? You can use the
+	Internet to learn these.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">A gcc
+	cross-compiler for the MIPS target machine has been compiled (yes,
+	the compiler itself was compiled) and made available to you. You
+	should see it in the folder /opt/mips-cross/bin in the NSL machines.
+	<i>Note: gcc stands for GNU C Compiler.</i></p>
+	</li><li><p style="font-variant: normal; font-style: normal">Add the
+	folder /opt/mips-cross/bin to your PATH environment variable.</p>
+	</li><li><p><i>Important note: you should not use any C or C++ library
+	routines, including I/O routines. The MIPS cross compiler available
+	in the NSL lab does not have support for these.</i></p>
+	</li><li><p style="font-variant: normal; font-style: normal">Download the
+	gcd.c code given in moodle. Make sure you understand the logic.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Compile the
+	above program using the cross compiler mips-linux-gcc, using the
+	“-S” option. The “-S” option specifies that the output of
+	the compiler should be assembly code. You should now have “gcd.s”.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">The assembly
+	code in “gcd.s” needs a few modifications before it can be run
+	on spim or xspim.</p>
+	<ul>
+		<li><p style="font-variant: normal; font-style: normal">There are a
+		few assembler directives which spim/xspim do not understand. Use
+		the program “remove_asm_directives.pl”, available on moodle, to
+		remove these. Call the new file as “gcd-noopt.s”.</p>
+		</li><li><p style="font-variant: normal; font-style: normal"><b>GCC
+		labeling convention [5 house points]:</b> Find out what the gcc
+		convention is for making labels; if you are the among the <b>first</b>
+		to find out and tell me, you will get <span style="font-weight: normal">5
+		house points.</span></p>
+		</li><li><p style="font-variant: normal; font-style: normal; font-weight: normal">
+		You should also define “result” in the data segment. And also
+		define the “syscall_print” procedure. You can use the
+		“asmutils.s” file for these. You can load the files
+		“asmutils.s” and “gcd-noopt.s” one after another in xspim
+		or qtspim.</p>
+	</li></ul>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Demo to
+	TA [1 mark]:</b> You should now be able to load the program on spim
+	or xspim and run it. Run it and show a demo to the TA.</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Demo to
+	TA [1 mark]:</b> Comment the gcd-noopt.s assembly code. Specifically
+	comment on the various parts of the stack frame for the gcd function
+	(there may be some parts of the frame which you cannot identify,
+	that is ok). Show the code with the comments to the TA.</p>
+	</li><li><p style="font-variant: normal; font-style: normal"><b>Complete
+	frame identification [Upto 5 house points]:</b> If you can identify
+	the entire frame convention (perhaps by using other example
+	programs), you will get 5 house points.</p>
+</li></ul>
+<h3 class="western" style="page-break-after: avoid"><font color="#0000ff">Getting
+the instruction execution count</font></h3>
+<ul>
+	<li><p><b>Demo to TA [1 mark]:</b> Learn to use “spim” (not
+	xspim or qtspim) from the command-line, and to give commands to make
+	it run “gcd-noopt.s”. Show a demo of this to the TA.</p>
+	</li><li><p><b>Demo to TA [1 mark]:</b> You can get spim to print each
+	executed instruction by using “step” with a numeric argument.
+	From this output of the spim execution above, get the exact
+	instruction execution count for <i>your</i> <span style="font-variant: normal"><span style="font-style: normal">program
+	(there may be a few instructions before and after </span></span><i>your</i>
+	<span style="font-variant: normal"><span style="font-style: normal">program,
+	be sure to not count these).</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Script
+	to get instruction count [upto 5 house points]:</b></span></span><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">Manually
+	counting the lines from spim's output can be painful. Use the
+	“script” command to automatically copy all printed stuff on the
+	screen to a file (don't use cut-paste from screen, that's a bit
+	painful too). Then write a bash script (python or perl would be an
+	overkill) to count the required number of executed instructions.</span></span></p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">GCC compiler optimization</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal">When you
+	look at the compiler generated assembly code, it is obvious that it
+	is inefficient. But it is not so bad as it seems. The compiler has
+	many optimization options. (You can read about these by using “man
+	gcc” if you are interested).</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal">Now
+	compile gcd.c using the “-O1” option; this specifies
+	optimization level-1. You will also have to use the
+	“-fno-delayed-branch” option. As earlier, use
+	</span></span>“<span style="font-variant: normal"><span style="font-style: normal">remove_asm_directives.pl”
+	and “asmutils.s”, to generate an assembly file ready for
+	execution in SPIM. Call this new assembly file “gcd-opt.s”.</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Demo
+	to TA [1 mark]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Show
+	that this new optimized version works correctly. Also show
+	“gcd-opt.s” with your appropriate comments added.</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Question
+	[1 mark]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Compute
+	the instruction execution count for “gcd-opt.s”. How much faster
+	is it compared to “gcd-noopt.s”?</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Delayed
+	branches [Upto 5 house points]:</b></span></span> Now compile gcd.c
+	with the -O1 option, but without the “-fno-delayed-branch”
+	option. This<span style="font-variant: normal"> </span><span style="font-variant: normal"><span style="font-style: normal">results
+	in uncovering an optimization feature called </span></span><i>delayed
+	branches</i><span style="font-variant: normal"><span style="font-style: normal">.
+	Learn at a high level, what delayed branches are (we will learn them
+	in detail anyway later in the course). Observe the use of the
+	delayed branch option. Now by default, the simulation will NOT work
+	correctly. Observe this. Can you use an appropriate SPIM
+	command-line option to execute your code correctly? (I couldn't
+	quite make it work correctly).</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Higher
+	optimization levels [Upto 10 house points]:</b></span></span>
+	<span style="font-variant: normal"><span style="font-style: normal">Understand
+	the code produced by optimization flags “-O2” or “-O3”. Get
+	them to execute on SPIM if possible, or explain why it would not be
+	possible.</span></span></p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">Answering performance related questions</font></h3>
+<ul>
+	<li><p style="font-variant: normal; font-style: normal">This
+	exercise will give a preview into the advantage of a multi-cycle
+	implementation.  We now want to use the simulator to compare the
+	performance of a single cycle implementation with a multi-cycle
+	implementation of the MIPS ISA. Assume that a multi-cycle
+	implementation uses a clock which is 5 times faster than a single
+	cycle implementation. Also assume that in a multi-cycle
+	implementation, the number of cycles taken for lw is 5, for sw is 4,
+	for all types of branch instructions is 3, and for all other
+	instructions is 4.</p>
+	</li><li><p style="font-variant: normal; font-style: normal">Write a
+	python script (or in any other language, preferably scripting
+	language), which takes the sequence of executed instructions output
+	by using the “step” command in spim in an input file, and
+	computes the number of cycles taken by the MIPS program. The script
+	should compute both (a) the number of cycles taken in a single cycle
+	implementation, as well as (b) the number of cycles taken in a
+	multi-cycle implementation. The script should print these cycle
+	counts, and also how much faster a multi-cycle implementation is
+	compared to a single cycle implementation.</p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Demo
+	to TA [2 marks]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Show
+	the running of the above script, on the output of “gcd-noopt.s”.</span></span></p>
+	</li><li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Demo
+	to TA [1 mark]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Show
+	the running of the above script, on the output of “gcd-opt.s”.</span></span></p>
+</li></ul>
+<h3 class="western" style="font-variant: normal; font-style: normal; page-break-after: avoid">
+<font color="#0000ff">More house points</font></h3>
+<ul>
+	<li><p><span style="font-variant: normal"><span style="font-style: normal"><b>Binary
+	search [Upto 10 house points]:</b></span></span> <span style="font-variant: normal"><span style="font-style: normal">Take
+	a C code version of your earlier binary search code. Compile into
+	MIPS assembly code and get it to run correctly.</span></span></p>
+</li></ul>
+<p><br><br>
+</p>
+
+</body></html>
